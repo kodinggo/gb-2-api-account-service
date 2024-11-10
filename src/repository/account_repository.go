@@ -18,9 +18,10 @@ func NewAccountRepository(db *sql.DB) model.AccountRepository {
 	return &accountRepository{db: db}
 }
 
-func (r *accountRepository) RegisterNewUser(ctx context.Context, data model.Account) (newAccount *model.Account, err error) {
+func (r *accountRepository) RegisterNewAccountToDatabase(ctx context.Context, data model.Account) (newAccount *model.Account, err error) {
 	now := time.Now().UTC()
 
+	logrus.Infof("Inserting account with gender: %s", data.Gender)
 	result, err := sq.Insert("accounts").
 		Columns("fullname", "sort_bio", "gender", "picture_url", "username", "email", "password", "role", "created_at", "updated_at").
 		Values(data.Fullname, data.SortBio, data.Gender, data.PictureUrl, data.Username, data.Email, data.Password, data.Role, now, now).
@@ -29,9 +30,22 @@ func (r *accountRepository) RegisterNewUser(ctx context.Context, data model.Acco
 
 	if err != nil {
 		logrus.WithField("data", data).Error(err)
+		return nil, err
 	}
 
-	lastInsertId, _ := result.LastInsertId()
+	lastInsertId, err := result.LastInsertId()
+	if err != nil {
+		logrus.Error("Error getting last insert ID:", err)
+	} else {
+		logrus.Infof("Last Insert ID: %d", lastInsertId)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		logrus.Error("Error getting rows affected:", err)
+	} else {
+		logrus.Infof("Rows Affected: %d", rowsAffected)
+	}
 
 	newAccount = &data
 	newAccount.ID = lastInsertId
