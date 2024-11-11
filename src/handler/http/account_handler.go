@@ -16,7 +16,7 @@ func NewAccountHandler(accountUsecase model.AccountUsecase) *AccountHandler {
 }
 
 func (handler *AccountHandler) RegisterRoute(e *echo.Echo) {
-	groupping := e.Group("account")
+	groupping := e.Group("accounts")
 
 	groupping.POST("/register", handler.register)
 }

@@ -23,8 +23,6 @@ func (account *accountUsecase) CreateNewAccountData(ctx context.Context, data mo
 		"data": data,
 	})
 
-	logrus.Infof("test ini dikasih dari usecase: %s", data)
-
 	imageUploaded, err := helper.SaveUploadedFile(fileHeader, "upload/picture/account")
 	if err != nil {
 		logger.Error(err)
@@ -63,4 +61,9 @@ func (account *accountUsecase) CreateNewAccountData(ctx context.Context, data mo
 	}
 
 	return acceesToken, nil
+}
+
+func (login *accountUsecase) Login(ctx context.Context, data model.Login) (token string, err error) {
+
+	return
 }

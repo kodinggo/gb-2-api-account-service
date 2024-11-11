@@ -21,7 +21,6 @@ func NewAccountRepository(db *sql.DB) model.AccountRepository {
 func (r *accountRepository) RegisterNewAccountToDatabase(ctx context.Context, data model.Account) (newAccount *model.Account, err error) {
 	now := time.Now().UTC()
 
-	logrus.Infof("Inserting account with gender: %s", data.Gender)
 	result, err := sq.Insert("accounts").
 		Columns("fullname", "sort_bio", "gender", "picture_url", "username", "email", "password", "role", "created_at", "updated_at").
 		Values(data.Fullname, data.SortBio, data.Gender, data.PictureUrl, data.Username, data.Email, data.Password, data.Role, now, now).
@@ -53,3 +52,6 @@ func (r *accountRepository) RegisterNewAccountToDatabase(ctx context.Context, da
 
 	return
 }
+
+// func (r *accountRepository) FindAccountByEmail(ctx context.Context, data model.Account)
+// TODO : Login and FindById
