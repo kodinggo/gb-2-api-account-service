@@ -4,8 +4,7 @@ import (
 	"account-service/src/helper"
 	"account-service/src/model"
 	"context"
-	"fmt"
-	"mime/multipart"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -18,17 +17,11 @@ func NewAccountUsecase(accountRepository model.AccountRepository) model.AccountU
 	return &accountUsecase{accountRepository: accountRepository}
 }
 
-func (account *accountUsecase) CreateNewAccountData(ctx context.Context, data model.Register, fileHeader *multipart.FileHeader) (token string, err error) {
+func (account *accountUsecase) CreateAccount(ctx context.Context, data model.Register) (token string, err error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"data": data,
 	})
 
-	imageUploaded, err := helper.SaveUploadedFile(fileHeader, "upload/picture/account")
-	if err != nil {
-		logger.Error(err)
-		return "", fmt.Errorf("failed to save uploaded file: %w", err)
-	}
-	data.PictureUrl = imageUploaded
 	passwordHashed, err := helper.HashRequestPassword(data.Password)
 
 	if err != nil {
@@ -36,15 +29,10 @@ func (account *accountUsecase) CreateNewAccountData(ctx context.Context, data mo
 		return
 	}
 
-	newAccount, err := account.accountRepository.RegisterNewAccountToDatabase(ctx, model.Account{
-		Fullname:   data.Fullname,
-		SortBio:    data.SortBio,
-		Gender:     data.Gender,
-		PictureUrl: data.PictureUrl,
-		Username:   data.Username,
-		Email:      data.Email,
-		Password:   passwordHashed,
-		Role:       data.Role,
+	newAccount, err := account.accountRepository.StoreAccount(ctx, model.Account{
+		Username: data.Username,
+		Email:    data.Email,
+		Password: passwordHashed,
 	})
 
 	if err != nil {
@@ -63,7 +51,28 @@ func (account *accountUsecase) CreateNewAccountData(ctx context.Context, data mo
 	return acceesToken, nil
 }
 
-func (login *accountUsecase) Login(ctx context.Context, data model.Login) (token string, err error) {
+func (u *accountUsecase) Login(ctx context.Context, data model.Login) (token string, err error) {
+	logger := logrus.WithFields(logrus.Fields{
+		"data": data.Email,
+	})
+
+	user, err := u.accountRepository.FindByEmail(ctx, data.Email)
+
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	if !helper.CheckPasswordHash(data.Password, user.Password) {
+		err = errors.New("incorrect password")
+		return
+	}
+
+	token, err = helper.GenerateToken(user.ID)
+
+	if err != nil {
+		logger.Error(err)
+	}
 
 	return
 }
