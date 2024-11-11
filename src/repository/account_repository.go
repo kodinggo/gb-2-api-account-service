@@ -53,5 +53,4 @@ func (r *accountRepository) RegisterNewAccountToDatabase(ctx context.Context, da
 	return
 }
 
-// func (r *accountRepository) FindAccountByEmail(ctx context.Context, data model.Account)
 // TODO : Login and FindById
