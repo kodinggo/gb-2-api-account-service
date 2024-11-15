@@ -6,8 +6,8 @@ import (
 )
 
 type AccountRepository interface {
-	StoreAccount(ctx context.Context, data Account) (*Account, error)
-	FindByEmail(ctx context.Context, email string) (*Login, error)
+	Store(ctx context.Context, data Account) (*Account, error)
+	FindByEmail(ctx context.Context, email string) *Login
 	//TODO : UpdateAccount & FindAccount By Id
 
 }
@@ -42,7 +42,7 @@ type Account struct {
 }
 
 type AccountUsecase interface {
-	CreateAccount(ctx context.Context, data Register) (token string, err error)
+	Create(ctx context.Context, data Register) (token string, err error)
 	Login(ctx context.Context, data Login) (token string, err error)
 }
 

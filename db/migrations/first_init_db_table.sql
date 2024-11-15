@@ -5,7 +5,7 @@ CREATE TABLE accounts (
     sort_bio VARCHAR(255) NULL,
     gender ENUM('male','female','others') DEFAULT 'others',
     picture_url VARCHAR(255) DEFAULT NULL,
-    username VARCHAR(255) NULL,
+    username VARCHAR(255),
     email VARCHAR(255),
     password VARCHAR(255),
     role ENUM('admin','member') DEFAULT 'member',

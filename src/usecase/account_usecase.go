@@ -17,24 +17,22 @@ func NewAccountUsecase(accountRepository model.AccountRepository) model.AccountU
 	return &accountUsecase{accountRepository: accountRepository}
 }
 
-func (account *accountUsecase) CreateAccount(ctx context.Context, data model.Register) (token string, err error) {
+func (account *accountUsecase) Create(ctx context.Context, data model.Register) (token string, err error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"data": data,
 	})
 
 	passwordHashed, err := helper.HashRequestPassword(data.Password)
-
 	if err != nil {
 		logger.Error(err)
 		return
 	}
 
-	newAccount, err := account.accountRepository.StoreAccount(ctx, model.Account{
+	newAccount, err := account.accountRepository.Store(ctx, model.Account{
 		Username: data.Username,
 		Email:    data.Email,
 		Password: passwordHashed,
 	})
-
 	if err != nil {
 		logger.Error(err)
 
@@ -42,7 +40,6 @@ func (account *accountUsecase) CreateAccount(ctx context.Context, data model.Reg
 	}
 
 	acceesToken, err := helper.GenerateToken(newAccount.ID)
-
 	if err != nil {
 		logger.Error(err)
 		return
@@ -56,15 +53,14 @@ func (u *accountUsecase) Login(ctx context.Context, data model.Login) (token str
 		"data": data.Email,
 	})
 
-	user, err := u.accountRepository.FindByEmail(ctx, data.Email)
-
-	if err != nil {
-		logger.Error(err)
+	user := u.accountRepository.FindByEmail(ctx, data.Email)
+	if user == nil {
+		err = errors.New("wrong email or password")
 		return
 	}
 
 	if !helper.CheckPasswordHash(data.Password, user.Password) {
-		err = errors.New("incorrect password")
+		err = errors.New("missmatch password")
 		return
 	}
 

@@ -4,7 +4,6 @@ import (
 	"account-service/src/model"
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -19,7 +18,7 @@ func NewAccountRepository(db *sql.DB) model.AccountRepository {
 	return &accountRepository{db: db}
 }
 
-func (r *accountRepository) StoreAccount(ctx context.Context, data model.Account) (newAccount *model.Account, err error) {
+func (r *accountRepository) Store(ctx context.Context, data model.Account) (newAccount *model.Account, err error) {
 	now := time.Now().UTC()
 
 	result, err := sq.Insert("accounts").
@@ -27,7 +26,6 @@ func (r *accountRepository) StoreAccount(ctx context.Context, data model.Account
 		Values(data.Username, data.Email, data.Password, now, now).
 		RunWith(r.db).
 		ExecContext(ctx)
-
 	if err != nil {
 		logrus.WithField("data", data).Error(err)
 		return nil, err
@@ -54,7 +52,7 @@ func (r *accountRepository) StoreAccount(ctx context.Context, data model.Account
 	return
 }
 
-func (r *accountRepository) FindByEmail(ctx context.Context, email string) (account *model.Login, err error) {
+func (r *accountRepository) FindByEmail(ctx context.Context, email string) (account *model.Login) {
 	row := sq.Select("id", "email", "password").
 		From("accounts").
 		Where(sq.Eq{"email": email}).
@@ -62,20 +60,14 @@ func (r *accountRepository) FindByEmail(ctx context.Context, email string) (acco
 		QueryRowContext(ctx)
 
 	var data model.Login
-
-	err = row.Scan(
+	err := row.Scan(
 		&data.ID,
 		&data.Email,
 		&data.Password,
 	)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			logrus.WithField("email", email).Error("email not found")
-			return nil, fmt.Errorf("email %s not found", email)
-		}
-		logrus.WithField("email", email).Error(err)
-		return nil, err
+		return
 	}
 
-	return &data, nil
+	return &data
 }
