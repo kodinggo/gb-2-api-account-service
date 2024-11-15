@@ -18,15 +18,14 @@ func NewAccountRepository(db *sql.DB) model.AccountRepository {
 	return &accountRepository{db: db}
 }
 
-func (r *accountRepository) RegisterNewAccountToDatabase(ctx context.Context, data model.Account) (newAccount *model.Account, err error) {
+func (r *accountRepository) Store(ctx context.Context, data model.Account) (newAccount *model.Account, err error) {
 	now := time.Now().UTC()
 
 	result, err := sq.Insert("accounts").
-		Columns("fullname", "sort_bio", "gender", "picture_url", "username", "email", "password", "role", "created_at", "updated_at").
-		Values(data.Fullname, data.SortBio, data.Gender, data.PictureUrl, data.Username, data.Email, data.Password, data.Role, now, now).
+		Columns("username", "email", "password", "created_at", "updated_at").
+		Values(data.Username, data.Email, data.Password, now, now).
 		RunWith(r.db).
 		ExecContext(ctx)
-
 	if err != nil {
 		logrus.WithField("data", data).Error(err)
 		return nil, err
@@ -53,4 +52,22 @@ func (r *accountRepository) RegisterNewAccountToDatabase(ctx context.Context, da
 	return
 }
 
-// TODO : Login and FindById
+func (r *accountRepository) FindByEmail(ctx context.Context, email string) (account *model.Login) {
+	row := sq.Select("id", "email", "password").
+		From("accounts").
+		Where(sq.Eq{"email": email}).
+		RunWith(r.db).
+		QueryRowContext(ctx)
+
+	var data model.Login
+	err := row.Scan(
+		&data.ID,
+		&data.Email,
+		&data.Password,
+	)
+	if err != nil {
+		return
+	}
+
+	return &data
+}

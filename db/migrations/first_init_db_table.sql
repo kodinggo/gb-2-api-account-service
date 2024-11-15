@@ -1,9 +1,9 @@
 -- +migrate Up
 CREATE TABLE accounts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    fullname VARCHAR(255),
-    sort_bio VARCHAR(255),
-    gender ENUM('male','female','others'),
+    fullname VARCHAR(255) NULL,
+    sort_bio VARCHAR(255) NULL,
+    gender ENUM('male','female','others') DEFAULT 'others',
     picture_url VARCHAR(255) DEFAULT NULL,
     username VARCHAR(255),
     email VARCHAR(255),

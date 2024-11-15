@@ -16,27 +16,37 @@ func NewAccountHandler(accountUsecase model.AccountUsecase) *AccountHandler {
 }
 
 func (handler *AccountHandler) RegisterRoute(e *echo.Echo) {
-	groupping := e.Group("accounts")
+	g := e.Group("v1/auth")
 
-	groupping.POST("/register", handler.register)
+	g.POST("/register", handler.register)
+	g.POST("/login", handler.login)
 }
 
 func (handler *AccountHandler) register(c echo.Context) error {
 	var body model.Register
-
 	if err := c.Bind(&body); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	file, err := c.FormFile("picture")
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "picture file is required")
-	}
-
-	accessToken, err := handler.accountUsecase.CreateNewAccountData(c.Request().Context(), body, file)
-
+	accessToken, err := handler.accountUsecase.Create(c.Request().Context(), body)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, Response{
+		AccessToken: accessToken,
+	})
+}
+
+func (handler *AccountHandler) login(c echo.Context) error {
+	var body model.Login
+	if err := c.Bind(&body); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	accessToken, err := handler.accountUsecase.Login(c.Request().Context(), body)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, Response{

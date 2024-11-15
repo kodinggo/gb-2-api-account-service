@@ -2,12 +2,14 @@ package model
 
 import (
 	"context"
-	"mime/multipart"
 	"time"
 )
 
 type AccountRepository interface {
-	RegisterNewAccountToDatabase(ctx context.Context, data Account) (*Account, error)
+	Store(ctx context.Context, data Account) (*Account, error)
+	FindByEmail(ctx context.Context, email string) *Login
+	//TODO : UpdateAccount & FindAccount By Id
+
 }
 
 type Gender string
@@ -40,22 +42,18 @@ type Account struct {
 }
 
 type AccountUsecase interface {
-	CreateNewAccountData(ctx context.Context, data Register, fileHeader *multipart.FileHeader) (token string, err error)
+	Create(ctx context.Context, data Register) (token string, err error)
 	Login(ctx context.Context, data Login) (token string, err error)
 }
 
 type Register struct {
-	Fullname   string `json:"fullname" form:"fullname"`
-	SortBio    string `json:"sort_bio" form:"sort_bio"`
-	Gender     Gender `json:"gender" form:"gender"`
-	PictureUrl string `json:"picture" form:"picture"`
-	Username   string `json:"username" form:"username"`
-	Email      string `json:"email" form:"email"`
-	Password   string `json:"password" form:"password"`
-	Role       Role   `json:"role" form:"role"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type Login struct {
+	ID       int64  `json:"id"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
