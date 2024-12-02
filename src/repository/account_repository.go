@@ -1,11 +1,12 @@
 package repository
 
 import (
-	"account-service/src/model"
 	"context"
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/sirupsen/logrus"
@@ -73,8 +74,9 @@ func (r *accountRepository) FindByEmail(ctx context.Context, email string) (acco
 	return &data
 }
 
-func (r *accountRepository) FindById(ctx context.Context, id int64) (*model.Account, error) {
-	row := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url", "role").
+
+func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Account, error) {
+	row := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url", "username", "email").
 		From("accounts").
 		Where(sq.Eq{"id": id}).
 		RunWith(r.db).
@@ -122,4 +124,5 @@ func (r *accountRepository) Update(ctx context.Context, account model.Account, i
 	}
 
 	return updatedAccount, nil
+
 }

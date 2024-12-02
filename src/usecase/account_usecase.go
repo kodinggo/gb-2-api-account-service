@@ -1,11 +1,12 @@
 package usecase
 
 import (
-	"account-service/src/helper"
-	"account-service/src/model"
 	"context"
 	"errors"
 	"fmt"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/helper"
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	"github.com/sirupsen/logrus"
 )
@@ -73,7 +74,6 @@ func (u *accountUsecase) Login(ctx context.Context, data model.Login) (token str
 
 	return
 }
-
 func (u *accountUsecase) FindById(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
 	account, err := u.accountRepository.FindById(ctx, id)
 	if err != nil {

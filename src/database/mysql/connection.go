@@ -1,10 +1,11 @@
 package mysql
 
 import (
-	"account-service/src/config"
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/config"
 
 	_ "github.com/go-sql-driver/mysql"
 )

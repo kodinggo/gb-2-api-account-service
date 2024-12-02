@@ -3,8 +3,11 @@ package httphandler
 import (
 	"account-service/src/model"
 	"log"
+
 	"net/http"
 	"strconv"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	"github.com/labstack/echo/v4"
 )

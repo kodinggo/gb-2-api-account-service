@@ -57,6 +57,7 @@ type AccountUsecase interface {
 type CustomClaims struct {
 	UserID int64 `json:"user_id"`
 	jwt.RegisteredClaims
+
 }
 
 type Register struct {
