@@ -20,10 +20,10 @@ func NewAccountHandler(accountUsecase model.AccountUsecase) *AccountHandler {
 func (handler *AccountHandler) RegisterRoute(e *echo.Echo) {
 	g := e.Group("v1/auth")
 
-	g.GET("/account/:id", handler.show)
+	g.GET("/account/:id", handler.show, AuthMiddleware)
 	g.POST("/register", handler.register)
 	g.POST("/login", handler.login)
-	g.PUT("/account/:id/update", handler.update)
+	g.PUT("/account/:id/update", handler.update, AuthMiddleware)
 
 }
 
@@ -65,9 +65,10 @@ func (handler *AccountHandler) show(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid ID format")
 	}
 
-	claim, ok := c.Request().Context().Value(model.BearerAuthKey).(*model.CustomClaims)
+	claim, ok := c.Request().Context().Value(model.BearerAuthKey).(model.CustomClaims)
+
 	if !ok {
-		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+		return echo.NewHTTPError(http.StatusUnauthorized)
 	}
 
 	log.Printf("Authenticated User ID: %d", claim.UserID)
@@ -89,9 +90,10 @@ func (handler *AccountHandler) update(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid ID format")
 	}
 
-	claim := c.Request().Context().Value(model.BearerAuthKey).(*model.CustomClaims)
-	if claim == nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	claim, ok := c.Request().Context().Value(model.BearerAuthKey).(model.CustomClaims)
+	log.Println(claim)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Unauthorized access. Please provide a valid token.")
 	}
 
 	var body model.Account
