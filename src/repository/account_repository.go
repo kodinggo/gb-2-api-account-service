@@ -106,19 +106,12 @@ func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Acco
 		return nil, err
 	}
 
-	account.Fullname = convertNullString(fullname)
-	account.SortBio = convertNullString(sortBio)
-	account.Gender = model.Gender(convertNullString(gender))
-	account.PictureUrl = convertNullString(pictureURL)
-	account.Username = convertNullString(username)
-	account.Email = convertNullString(email)
+	account.Fullname = fullname.String
+	account.SortBio = sortBio.String
+	account.Gender = model.Gender(gender.String)
+	account.PictureUrl = pictureURL.String
+	account.Username = username.String
+	account.Email = email.String
 
 	return &account, nil
-}
-
-func convertNullString(ns sql.NullString) string {
-	if ns.Valid {
-		return ns.String
-	}
-	return ""
 }
