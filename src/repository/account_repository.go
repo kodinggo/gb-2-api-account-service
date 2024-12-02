@@ -4,6 +4,7 @@ import (
 	"account-service/src/model"
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -70,4 +71,49 @@ func (r *accountRepository) FindByEmail(ctx context.Context, email string) (acco
 	}
 
 	return &data
+}
+
+func (r *accountRepository) FindById(ctx context.Context, id int64) (*model.Account, error) {
+	row := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url").
+		From("accounts").
+		Where(sq.Eq{"id": id}).
+		RunWith(r.db).
+		QueryRowContext(ctx)
+
+	var fullname, sortBio, gender, pictureUrl sql.NullString
+
+	var data model.Account
+	err := row.Scan(
+		&data.ID,
+		&fullname,
+		&sortBio,
+		&gender,
+		&pictureUrl,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch account with id %d: %w", id, err)
+	}
+	data.Fullname = fullname.String
+	data.SortBio = sortBio.String
+	data.Gender = model.Gender(gender.String)
+	data.PictureUrl = pictureUrl.String
+
+	return &data, nil
+}
+
+func (r *accountRepository) Update(ctx context.Context, account model.Account, id int64) error {
+	_, err := sq.Update("accounts").
+		Set("fullname", account.Fullname).
+		Set("sort_bio", account.SortBio).
+		Set("gender", account.Gender).
+		Set("picture_url", account.PictureUrl).
+		Where(sq.Eq{"id": id}).
+		RunWith(r.db).
+		ExecContext(ctx)
+
+	if err != nil {
+		return nil
+	}
+
+	return err
 }
