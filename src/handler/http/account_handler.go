@@ -2,6 +2,7 @@ package httphandler
 
 import (
 	"account-service/src/model"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -57,13 +58,19 @@ func (handler *AccountHandler) login(c echo.Context) error {
 		AccessToken: accessToken,
 	})
 }
-
 func (handler *AccountHandler) show(c echo.Context) error {
 	idParam := c.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid ID format")
 	}
+
+	claim, ok := c.Request().Context().Value(model.BearerAuthKey).(*model.CustomClaims)
+	if !ok {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
+	log.Printf("Authenticated User ID: %d", claim.UserID)
 
 	account, err := handler.accountUsecase.FindById(c.Request().Context(), model.Account{}, id)
 	if err != nil {
@@ -81,18 +88,23 @@ func (handler *AccountHandler) update(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid ID format")
 	}
+
+	claim := c.Request().Context().Value(model.BearerAuthKey).(*model.CustomClaims)
+	if claim == nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+	}
+
 	var body model.Account
 	if err := c.Bind(&body); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	account, err := handler.accountUsecase.Update(c.Request().Context(), body, id)
+	updatedAccount, err := handler.accountUsecase.Update(c.Request().Context(), body, id)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
-
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, Response{
-		Data: account,
+		Data: updatedAccount,
 	})
 }

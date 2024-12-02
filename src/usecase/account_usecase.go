@@ -87,22 +87,18 @@ func (u *accountUsecase) FindById(ctx context.Context, data model.Account, id in
 	return account, nil
 }
 
-func (u *accountUsecase) Update(ctx context.Context, data model.Account, id int64) error {
+func (u *accountUsecase) Update(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"email": data.Email,
 		"id":    id,
 	})
 
-	account, err := u.accountRepository.Update(ctx, data, id)
+	updatedAccount, err := u.accountRepository.Update(ctx, data, id)
 	if err != nil {
 		logger.Error("Failed to update account: ", err)
-		return err
+		return nil, err
 	}
-	_, err = u.accountRepository.FindById(ctx, id)
-	if err != nil {
-		logger.Error("Failed to fetch updated account: ", err)
-		return err
-	}
+
 	logger.Info("Account updated successfully")
-	return account, nil
+	return updatedAccount, nil
 }
