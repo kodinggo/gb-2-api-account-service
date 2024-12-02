@@ -1,10 +1,11 @@
 package repository
 
 import (
-	"account-service/src/model"
 	"context"
 	"database/sql"
 	"time"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/sirupsen/logrus"
@@ -70,4 +71,47 @@ func (r *accountRepository) FindByEmail(ctx context.Context, email string) (acco
 	}
 
 	return &data
+}
+
+func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Account, error) {
+	row := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url", "username", "email").
+		From("accounts").
+		Where(sq.Eq{"id": id}).
+		RunWith(r.db).
+		QueryRowContext(ctx)
+
+	var (
+		fullname   sql.NullString
+		sortBio    sql.NullString
+		gender     sql.NullString
+		pictureURL sql.NullString
+		username   sql.NullString
+		email      sql.NullString
+	)
+
+	account := model.Account{}
+
+	err := row.Scan(
+		&account.ID,
+		&fullname,
+		&sortBio,
+		&gender,
+		&pictureURL,
+		&username,
+		&email,
+	)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	account.Fullname = fullname.String
+	account.SortBio = sortBio.String
+	account.Gender = model.Gender(gender.String)
+	account.PictureUrl = pictureURL.String
+	account.Username = username.String
+	account.Email = email.String
+
+	return &account, nil
 }

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package pb.account;
+
+option go_package = "github.com/kodinggo/gb-2-api-account-service";
+
+message Account {
+    int64 id = 1;
+    string fullname = 2;
+    string sort_bio = 3;
+    Gender gender = 4;
+    string picture_url = 5;
+    string username = 6;
+    string email = 7;
+
+    enum Gender {
+        MALE = 0;
+        FEMALE = 1;
+        OTHERS = 2;
+    }
+}
+
+message Accounts {
+    repeated Account accounts = 1;
+}
+
+
+

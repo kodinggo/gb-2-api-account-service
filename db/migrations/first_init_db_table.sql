@@ -11,7 +11,7 @@ CREATE TABLE accounts (
     role ENUM('admin','member') DEFAULT 'member',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP DEFAULT NULL
+    deleted_at TIMESTAMP NULL DEFAULT NULL
 );
 
 -- +migrate Down
