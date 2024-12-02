@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	dbmysql "account-service/src/database/mysql"
+	dbmysql "github.com/kodinggo/gb-2-api-account-service/src/database/mysql"
 
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/spf13/cobra"

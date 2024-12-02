@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb.account;
+
+option go_package = "github.com/kodinggo/gb-2-api-account-service";
+
+import "pb/account/account.proto";
+
+message FindByIDRequest {
+    int64 id = 1;
+}
+
+service AccountService {
+    rpc FindByID(FindByIDRequest) returns (Account) {}
+}
