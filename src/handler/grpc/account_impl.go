@@ -18,7 +18,7 @@ func NewAccountgRPCHandler(usecase model.AccountUsecase) pb.AccountServiceServer
 	return &AccountgRPCHandler{usecase: usecase}
 }
 
-func (a *AccountgRPCHandler) FindByID(ctx context.Context, req *pb.FindByIDRequest) (*pb.Account, error) {
+func (a *AccountgRPCHandler) FindByID(ctx context.Context, req *pb.FindByIDsRequest) (*pb.Account, error) {
 	account, err := a.usecase.FindByID(ctx, req.Id)
 	if err != nil {
 		if err.Error() == "not found" {

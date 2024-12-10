@@ -6,10 +6,10 @@ option go_package = "github.com/kodinggo/gb-2-api-account-service";
 
 import "pb/account/account.proto";
 
-message FindByIDRequest {
+message FindByIDsRequest {
     int64 id = 1;
 }
 
 service AccountService {
-    rpc FindByID(FindByIDRequest) returns (Account) {}
+    rpc FindByIDs(FindByIDsRequest) returns (Account) {}
 }
