@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AccountService_FindByID_FullMethodName = "/pb.account.AccountService/FindByID"
+	AccountService_FindByIDs_FullMethodName = "/pb.account.AccountService/FindByIDs"
 )
 
 // AccountServiceClient is the client API for AccountService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AccountServiceClient interface {
-	FindByID(ctx context.Context, in *FindByIDRequest, opts ...grpc.CallOption) (*Account, error)
+	FindByIDs(ctx context.Context, in *FindByIDsRequest, opts ...grpc.CallOption) (*Account, error)
 }
 
 type accountServiceClient struct {
@@ -37,10 +37,10 @@ func NewAccountServiceClient(cc grpc.ClientConnInterface) AccountServiceClient {
 	return &accountServiceClient{cc}
 }
 
-func (c *accountServiceClient) FindByID(ctx context.Context, in *FindByIDRequest, opts ...grpc.CallOption) (*Account, error) {
+func (c *accountServiceClient) FindByIDs(ctx context.Context, in *FindByIDsRequest, opts ...grpc.CallOption) (*Account, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Account)
-	err := c.cc.Invoke(ctx, AccountService_FindByID_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AccountService_FindByIDs_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *accountServiceClient) FindByID(ctx context.Context, in *FindByIDRequest
 // All implementations must embed UnimplementedAccountServiceServer
 // for forward compatibility.
 type AccountServiceServer interface {
-	FindByID(context.Context, *FindByIDRequest) (*Account, error)
+	FindByIDs(context.Context, *FindByIDsRequest) (*Account, error)
 	mustEmbedUnimplementedAccountServiceServer()
 }
 
@@ -62,8 +62,8 @@ type AccountServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAccountServiceServer struct{}
 
-func (UnimplementedAccountServiceServer) FindByID(context.Context, *FindByIDRequest) (*Account, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindByID not implemented")
+func (UnimplementedAccountServiceServer) FindByIDs(context.Context, *FindByIDsRequest) (*Account, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindByIDs not implemented")
 }
 func (UnimplementedAccountServiceServer) mustEmbedUnimplementedAccountServiceServer() {}
 func (UnimplementedAccountServiceServer) testEmbeddedByValue()                        {}
@@ -86,20 +86,20 @@ func RegisterAccountServiceServer(s grpc.ServiceRegistrar, srv AccountServiceSer
 	s.RegisterService(&AccountService_ServiceDesc, srv)
 }
 
-func _AccountService_FindByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FindByIDRequest)
+func _AccountService_FindByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindByIDsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AccountServiceServer).FindByID(ctx, in)
+		return srv.(AccountServiceServer).FindByIDs(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AccountService_FindByID_FullMethodName,
+		FullMethod: AccountService_FindByIDs_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AccountServiceServer).FindByID(ctx, req.(*FindByIDRequest))
+		return srv.(AccountServiceServer).FindByIDs(ctx, req.(*FindByIDsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var AccountService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AccountServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "FindByID",
-			Handler:    _AccountService_FindByID_Handler,
+			MethodName: "FindByIDs",
+			Handler:    _AccountService_FindByIDs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
