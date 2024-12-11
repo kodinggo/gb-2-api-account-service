@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/kodinggo/gb-2-api-account-service/src/helper"
 	"github.com/kodinggo/gb-2-api-account-service/src/model"
@@ -73,14 +74,31 @@ func (u *accountUsecase) Login(ctx context.Context, data model.Login) (token str
 
 	return
 }
-
-func (u *accountUsecase) FindByID(ctx context.Context, id int64) (*model.Account, error) {
-	account, err := u.accountRepository.FindByID(ctx, id)
+func (u *accountUsecase) FindById(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
+	account, err := u.accountRepository.FindById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
 	if account == nil {
-		return nil, errors.New("not found")
+		return nil, fmt.Errorf("account with id %d not found", id)
 	}
+
 	return account, nil
+}
+
+func (u *accountUsecase) Update(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
+	logger := logrus.WithFields(logrus.Fields{
+		"email": data.Email,
+		"id":    id,
+	})
+
+	updatedAccount, err := u.accountRepository.Update(ctx, data, id)
+	if err != nil {
+		logger.Error("Failed to update account: ", err)
+		return nil, err
+	}
+
+	logger.Info("Account updated successfully")
+	return updatedAccount, nil
 }

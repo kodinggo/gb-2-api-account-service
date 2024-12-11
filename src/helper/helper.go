@@ -1,6 +1,10 @@
 package helper
 
 import (
+	"account-service/src/config"
+	"account-service/src/model"
+
+
 	"time"
 
 	"github.com/kodinggo/gb-2-api-account-service/src/config"
@@ -25,5 +29,12 @@ func GenerateToken(userID int64) (strToken string, err error) {
 		"exp":     expiredAt.Unix(),
 		"user_id": userID,
 	}).SignedString([]byte(config.JWTSigningKey()))
+	return
+}
+
+func DecodeToken(token string, claim *model.CustomClaims) (err error) {
+	jwt.ParseWithClaims(token, claim, func(t *jwt.Token) (interface{}, error) {
+		return []byte(config.JWTSigningKey()), nil
+	})
 	return
 }
