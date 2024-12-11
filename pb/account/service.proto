@@ -7,7 +7,7 @@ option go_package = "github.com/kodinggo/gb-2-api-account-service";
 import "pb/account/account.proto";
 
 message FindByIDsRequest {
-    int64 id = 1;
+    repeated int64 ids = 1;
 }
 
 service AccountService {

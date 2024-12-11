@@ -19,10 +19,10 @@ func NewAccountgRPCHandler(usecase model.AccountUsecase) pb.AccountServiceServer
 }
 
 func (a *AccountgRPCHandler) FindByID(ctx context.Context, req *pb.FindByIDsRequest) (*pb.Account, error) {
-	account, err := a.usecase.FindByID(ctx, req.Id)
+	account, err := a.usecase.FindByID(ctx, req.Ids[0])
 	if err != nil {
 		if err.Error() == "not found" {
-			return nil, status.Errorf(codes.NotFound, "account with ID %d not found", req.Id)
+			return nil, status.Errorf(codes.NotFound, "account with ID %d not found", req.Ids[0])
 		}
 		return nil, status.Errorf(codes.Internal, "error finding account: %v", err)
 	}
