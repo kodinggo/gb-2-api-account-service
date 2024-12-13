@@ -115,3 +115,56 @@ func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Acco
 
 	return &account, nil
 }
+
+func (r *accountRepository) FindByIDs(ctx context.Context, ids []int64) ([]*model.Account, error) {
+	rows, err := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url", "username", "email").
+		From("accounts").
+		Where(sq.Eq{"id": ids}).
+		RunWith(r.db).
+		QueryContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var accounts []*model.Account
+	for rows.Next() {
+		var (
+			fullname   sql.NullString
+			sortBio    sql.NullString
+			gender     sql.NullString
+			pictureURL sql.NullString
+			username   sql.NullString
+			email      sql.NullString
+		)
+
+		account := &model.Account{}
+		err := rows.Scan(
+			&account.ID,
+			&fullname,
+			&sortBio,
+			&gender,
+			&pictureURL,
+			&username,
+			&email,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		account.Fullname = fullname.String
+		account.SortBio = sortBio.String
+		account.Gender = model.Gender(gender.String)
+		account.PictureUrl = pictureURL.String
+		account.Username = username.String
+		account.Email = email.String
+
+		accounts = append(accounts, account)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return accounts, nil
+}

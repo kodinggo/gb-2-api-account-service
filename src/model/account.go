@@ -9,6 +9,7 @@ type AccountRepository interface {
 	Store(ctx context.Context, data Account) (*Account, error)
 	FindByEmail(ctx context.Context, email string) *Login
 	FindByID(ctx context.Context, id int64) (*Account, error)
+	FindByIDs(ctx context.Context, ids []int64) ([]*Account, error)
 	//TODO : UpdateAccount & FindAccount By Id
 
 }
@@ -46,6 +47,7 @@ type AccountUsecase interface {
 	Create(ctx context.Context, data Register) (token string, err error)
 	Login(ctx context.Context, data Login) (token string, err error)
 	FindByID(ctx context.Context, id int64) (*Account, error)
+	FindByIDs(ctx context.Context, ids []int64) ([]*Account, error)
 }
 
 type Register struct {

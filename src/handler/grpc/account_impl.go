@@ -18,11 +18,11 @@ func NewAccountgRPCHandler(usecase model.AccountUsecase) pb.AccountServiceServer
 	return &AccountgRPCHandler{usecase: usecase}
 }
 
-func (a *AccountgRPCHandler) FindByID(ctx context.Context, req *pb.FindByIDsRequest) (*pb.Account, error) {
-	account, err := a.usecase.FindByID(ctx, req.Ids[0])
+func (a *AccountgRPCHandler) FindByID(ctx context.Context, req *pb.FindByIDRequest) (*pb.Account, error) {
+	account, err := a.usecase.FindByID(ctx, req.Id)
 	if err != nil {
 		if err.Error() == "not found" {
-			return nil, status.Errorf(codes.NotFound, "account with ID %d not found", req.Ids[0])
+			return nil, status.Errorf(codes.NotFound, "account with ID %d not found", req.Id)
 		}
 		return nil, status.Errorf(codes.Internal, "error finding account: %v", err)
 	}
@@ -37,6 +37,28 @@ func (a *AccountgRPCHandler) FindByID(ctx context.Context, req *pb.FindByIDsRequ
 		Email:      account.Email,
 	}, nil
 
+}
+
+func (a *AccountgRPCHandler) FindByIDs(ctx context.Context, req *pb.FindByIDsRequest) (*pb.Accounts, error) {
+	accounts, err := a.usecase.FindByIDs(ctx, req.Ids)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "error finding accounts: %v", err)
+	}
+
+	var protoAccounts []*pb.Account
+	for _, account := range accounts {
+		protoAccounts = append(protoAccounts, &pb.Account{
+			Id:         account.ID,
+			Fullname:   account.Fullname,
+			SortBio:    account.SortBio,
+			Gender:     convertGenderToProto(account.Gender),
+			PictureUrl: account.PictureUrl,
+			Username:   account.Username,
+			Email:      account.Email,
+		})
+	}
+
+	return &pb.Accounts{Accounts: protoAccounts}, nil
 }
 
 func convertGenderToProto(gender model.Gender) pb.Account_Gender {

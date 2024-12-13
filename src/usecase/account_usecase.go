@@ -84,3 +84,14 @@ func (u *accountUsecase) FindByID(ctx context.Context, id int64) (*model.Account
 	}
 	return account, nil
 }
+
+func (u *accountUsecase) FindByIDs(ctx context.Context, ids []int64) ([]*model.Account, error) {
+	accounts, err := u.accountRepository.FindByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	if accounts == nil {
+		return nil, errors.New("not found")
+	}
+	return accounts, nil
+}
