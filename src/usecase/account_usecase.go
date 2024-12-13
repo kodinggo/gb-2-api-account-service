@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/kodinggo/gb-2-api-account-service/src/helper"
 	"github.com/kodinggo/gb-2-api-account-service/src/model"
@@ -74,16 +73,14 @@ func (u *accountUsecase) Login(ctx context.Context, data model.Login) (token str
 
 	return
 }
-func (u *accountUsecase) FindById(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
-	account, err := u.accountRepository.FindById(ctx, id)
+func (u *accountUsecase) FindByID(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
+	account, err := u.accountRepository.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-
 	if account == nil {
-		return nil, fmt.Errorf("account with id %d not found", id)
+		return nil, errors.New("not found")
 	}
-
 	return account, nil
 }
 
@@ -103,4 +100,13 @@ func (u *accountUsecase) Update(ctx context.Context, data model.Account, id int6
 	return updatedAccount, nil
 }
 
-
+func (u *accountUsecase) FindByIDs(ctx context.Context, ids []int64) ([]*model.Account, error) {
+	accounts, err := u.accountRepository.FindByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	if accounts == nil {
+		return nil, errors.New("not found")
+	}
+	return accounts, nil
+}

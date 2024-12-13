@@ -74,9 +74,8 @@ func (r *accountRepository) FindByEmail(ctx context.Context, email string) (acco
 	return &data
 }
 
-
 func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Account, error) {
-	row := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url", "username", "email").
+	row := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url", "username", "role").
 		From("accounts").
 		Where(sq.Eq{"id": id}).
 		RunWith(r.db).
@@ -91,6 +90,7 @@ func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Acco
 		&sortBio,
 		&gender,
 		&pictureUrl,
+		&data.Username,
 		&data.Role,
 	)
 	if err != nil {
@@ -100,31 +100,9 @@ func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Acco
 	data.SortBio = sortBio.String
 	data.Gender = model.Gender(gender.String)
 	data.PictureUrl = pictureUrl.String
+	data.Role = model.Role(data.Role)
 
 	return &data, nil
-}
-
-func (r *accountRepository) Update(ctx context.Context, account model.Account, id int64) (*model.Account, error) {
-	_, err := sq.Update("accounts").
-		Set("fullname", account.Fullname).
-		Set("sort_bio", account.SortBio).
-		Set("gender", account.Gender).
-		Set("picture_url", account.PictureUrl).
-		Where(sq.Eq{"id": id}).
-		RunWith(r.db).
-		ExecContext(ctx)
-
-	if err != nil {
-		return nil, err
-	}
-
-	updatedAccount, err := r.FindById(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return updatedAccount, nil
-
 }
 
 func (r *accountRepository) Update(ctx context.Context, account model.Account, id int64) (*model.Account, error) {

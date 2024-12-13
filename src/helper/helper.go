@@ -1,13 +1,10 @@
 package helper
 
 import (
-	"account-service/src/config"
-	"account-service/src/model"
-
+	"github.com/kodinggo/gb-2-api-account-service/src/config"
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	"time"
-
-	"github.com/kodinggo/gb-2-api-account-service/src/config"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"

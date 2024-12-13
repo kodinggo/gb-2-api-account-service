@@ -1,13 +1,12 @@
 package httphandler
 
 import (
-	"account-service/src/model"
 	"log"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	"net/http"
 	"strconv"
-
-	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	"github.com/labstack/echo/v4"
 )
@@ -76,7 +75,7 @@ func (handler *AccountHandler) show(c echo.Context) error {
 
 	log.Printf("Authenticated User ID: %d", claim.UserID)
 
-	account, err := handler.accountUsecase.FindById(c.Request().Context(), model.Account{}, id)
+	account, err := handler.accountUsecase.FindByID(c.Request().Context(), model.Account{}, id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
