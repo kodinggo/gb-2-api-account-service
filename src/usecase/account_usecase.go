@@ -102,3 +102,5 @@ func (u *accountUsecase) Update(ctx context.Context, data model.Account, id int6
 	logger.Info("Account updated successfully")
 	return updatedAccount, nil
 }
+
+
