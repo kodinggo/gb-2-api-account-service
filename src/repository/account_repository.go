@@ -116,6 +116,29 @@ func (r *accountRepository) FindByID(ctx context.Context, id int64) (*model.Acco
 	return &account, nil
 }
 
+func (r *accountRepository) Update(ctx context.Context, account model.Account, id int64) (*model.Account, error) {
+	_, err := sq.Update("accounts").
+		Set("fullname", account.Fullname).
+		Set("sort_bio", account.SortBio).
+		Set("gender", account.Gender).
+		Set("picture_url", account.PictureUrl).
+		Where(sq.Eq{"id": id}).
+		RunWith(r.db).
+		ExecContext(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAccount, err := r.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedAccount, nil
+
+}
+
 func (r *accountRepository) FindByIDs(ctx context.Context, ids []int64) ([]*model.Account, error) {
 	rows, err := sq.Select("id", "fullname", "sort_bio", "gender", "picture_url", "username", "email").
 		From("accounts").
