@@ -1,12 +1,13 @@
 package httphandler
 
 import (
-	"account-service/src/helper"
-	"account-service/src/model"
 	"context"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/helper"
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	"github.com/labstack/echo/v4"
 )

@@ -19,7 +19,6 @@ message Account {
         OTHERS = 2;
     }
 }
-
 message Accounts {
     repeated Account accounts = 1;
 }
