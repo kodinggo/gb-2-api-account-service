@@ -3,13 +3,21 @@ package model
 import (
 	"context"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
+
+type ContextAuthKey string
+
+const BearerAuthKey ContextAuthKey = "BearerAuth"
 
 type AccountRepository interface {
 	Store(ctx context.Context, data Account) (*Account, error)
 	FindByEmail(ctx context.Context, email string) *Login
+	FindByID(ctx context.Context, id int64) (*Account, error)
+	Update(ctx context.Context, account Account, id int64) (*Account, error)
+	FindByIDs(ctx context.Context, ids []int64) ([]*Account, error)
 	//TODO : UpdateAccount & FindAccount By Id
-
 }
 
 type Gender string
@@ -32,8 +40,8 @@ type Account struct {
 	SortBio    string    `json:"sort_bio"`
 	Gender     Gender    `json:"gender"`
 	PictureUrl string    `json:"picture_url"`
-	Username   string    `json:"username"`
-	Email      string    `json:"email"`
+	Username   string    `json:"-"`
+	Email      string    `json:"-"`
 	Password   string    `json:"-"`
 	Role       Role      `json:"role"`
 	CreatedAt  time.Time `json:"created_at"`
@@ -44,6 +52,15 @@ type Account struct {
 type AccountUsecase interface {
 	Create(ctx context.Context, data Register) (token string, err error)
 	Login(ctx context.Context, data Login) (token string, err error)
+
+	FindByID(ctx context.Context, data Account, id int64) (*Account, error)
+	Update(ctx context.Context, data Account, id int64) (*Account, error)
+	FindByIDs(ctx context.Context, ids []int64) ([]*Account, error)
+}
+
+type CustomClaims struct {
+	UserID int64 `json:"user_id"`
+	jwt.RegisteredClaims
 }
 
 type Register struct {

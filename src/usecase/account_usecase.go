@@ -1,10 +1,11 @@
 package usecase
 
 import (
-	"account-service/src/helper"
-	"account-service/src/model"
 	"context"
 	"errors"
+
+	"github.com/kodinggo/gb-2-api-account-service/src/helper"
+	"github.com/kodinggo/gb-2-api-account-service/src/model"
 
 	"github.com/sirupsen/logrus"
 )
@@ -71,4 +72,41 @@ func (u *accountUsecase) Login(ctx context.Context, data model.Login) (token str
 	}
 
 	return
+}
+func (u *accountUsecase) FindByID(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
+	account, err := u.accountRepository.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if account == nil {
+		return nil, errors.New("not found")
+	}
+	return account, nil
+}
+
+func (u *accountUsecase) Update(ctx context.Context, data model.Account, id int64) (*model.Account, error) {
+	logger := logrus.WithFields(logrus.Fields{
+		"email": data.Email,
+		"id":    id,
+	})
+
+	updatedAccount, err := u.accountRepository.Update(ctx, data, id)
+	if err != nil {
+		logger.Error("Failed to update account: ", err)
+		return nil, err
+	}
+
+	logger.Info("Account updated successfully")
+	return updatedAccount, nil
+}
+
+func (u *accountUsecase) FindByIDs(ctx context.Context, ids []int64) ([]*model.Account, error) {
+	accounts, err := u.accountRepository.FindByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+	if accounts == nil {
+		return nil, errors.New("not found")
+	}
+	return accounts, nil
 }
